@@ -4,6 +4,17 @@ version = "0.1.0"
 authors = ["Karolis Rusenas <karolis.rusenas@gmail.com>"]
 edition = "2018"
 
+
+[profile.release]
+opt-level = 'z'
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+whr-rs = {path = "../../../whr-rs"}
+
