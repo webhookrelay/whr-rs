@@ -48,6 +48,10 @@ pub struct Request {
 }
 
 impl Request {
+    fn new(p: PayloadStruct) -> Self {
+        Request{payload: p}
+    }
+
     // get_body returns request body string
     fn get_body(self) -> String {
         self.payload.body
@@ -70,6 +74,21 @@ impl Request {
             ext_set_request_method(method.as_ptr(), method.len());
         }
     }
+}
+
+/// Run a function
+/// 
+pub fn run(ptr: i32, len: i32, to_run: fn(Request)) {
+    let slice = unsafe { slice::from_raw_parts(ptr as _, len as _) };
+    // need to parse here the contents into some struct where we can get body
+    // example: {"body":"some-body-here","method":"PUT", "raw_query": "/foo/bar"}
+    let string_from_host = str::from_utf8(&slice).unwrap();
+
+    let payload = parse_payload(string_from_host);
+
+    let request = Request::new(payload);
+
+    to_run(request)
 }
 
 pub fn parse_payload(payload_string: &str) -> PayloadStruct {
