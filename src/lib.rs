@@ -35,12 +35,25 @@ pub struct PayloadStruct {
     // Use the type's implementation of std::default::Default if
     // "method" or other fields are not included in the input.
     #[serde(default)]
-    method: String,
+    pub method: String,
     #[serde(default)]
-    raw_query: String,
+    pub path: String,
     #[serde(default)]
-    body: String,
+    pub raw_query: String,
+    #[serde(default)]
+    pub body: String,
     // TODO: add headers
+}
+
+impl Clone for PayloadStruct {
+    fn clone(&self) -> Self {
+        Self {
+            method: self.method.clone(),
+            path: self.path.clone(),
+            raw_query: self.raw_query.clone(),
+            body: self.body.clone(),
+        }
+    }
 }
 
 // #[derive(Clone, Copy)]
@@ -48,19 +61,32 @@ pub struct Request {
     payload: PayloadStruct,
 }
 
+impl Clone for Request {
+    fn clone(&self) -> Self {
+        Self {
+            payload: self.payload.clone(),
+        }
+    }
+}
+
 impl Request {
     fn new(p: PayloadStruct) -> Self {
-        Request{payload: p}
+        Request { payload: p }
     }
 
     // get_body returns request body string
-    pub fn get_body(self) -> String {
+    pub fn get_body(&self) -> String {
         self.payload.body.clone()
     }
+
+    pub fn get_path(&self) -> String {
+        self.payload.path.clone()
+    }
+
     // get_method returns request method
-    pub fn get_method(self) -> String {
+    pub fn get_method(&self) -> String {
         self.payload.method.clone()
-    }     
+    }
 }
 
 // set_request_body - modify request body
@@ -78,9 +104,9 @@ pub fn set_request_method(method: String) {
 }
 
 // set_request_path - update request path. This new path
-// will be added to the Output destination's path. If WHR Output 
-// path is /v1/store and this function sets /foo then the webhook 
-// will be sent to /v1/store/foo 
+// will be added to the Output destination's path. If WHR Output
+// path is /v1/store and this function sets /foo then the webhook
+// will be sent to /v1/store/foo
 pub fn set_request_path(path: String) {
     unsafe {
         ext_set_request_path(path.as_ptr(), path.len());
@@ -96,7 +122,7 @@ pub fn set_request_raw_query(query: String) {
 }
 
 /// Run a function
-/// 
+///
 pub fn run(ptr: i32, len: i32, to_run: fn(Request)) {
     let slice = unsafe { slice::from_raw_parts(ptr as _, len as _) };
     // need to parse here the contents into some struct where we can get body
