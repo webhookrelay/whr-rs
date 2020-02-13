@@ -35,6 +35,20 @@ To build rust function into a compatible wasm binary, use cargo:
 cargo build --target wasm32-unknown-unknown --release
 ```
 
+Once wasm binary is built, add it to your functions using [relay CLI](https://webhookrelay.com/v1/installation/cli):
+
+```
+relay function create path/to/hello_world.wasm
+```
+
+To view your functions:
+
+```
+relay function ls                                                                         
+ID                                     NAME                 DRIVER              SIZE                AGE                 UPDATED AGO
+064cf2ad-03e9-4707-b410-35be5bc125e9   hello_world          wasm                501 kB              11 hours            11 hours
+```
+
 ## Installing toolchain
 
 Toolchain can be installed using rustup:
