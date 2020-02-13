@@ -2,6 +2,10 @@
 
 This is a helper library to transform webhook request with [Webhook Relay Functions](https://webhookrelay.com/v1/guide/functions).
 
+Functions can be executed on public endpoints and for each destination (Webhook Relay can send same request to multiple destinations) allowing to customize data per service. In general, functions modify your request properties:
+
+![function transform example](https://webhookrelay.com/images/docs-forwarding/functions.png)
+
 Example:
 
 ```rust
@@ -47,6 +51,12 @@ To view your functions:
 relay function ls                                                                         
 ID                                     NAME                 DRIVER              SIZE                AGE                 UPDATED AGO
 064cf2ad-03e9-4707-b410-35be5bc125e9   hello_world          wasm                501 kB              11 hours            11 hours
+```
+
+To create a public endpoint that's transforming webhooks with your function before sending them to your specified destination:
+
+```
+relay forward --bucket lib-rs --function hello_world --type public https://some-service.example.com/webhooks
 ```
 
 ## Installing toolchain
