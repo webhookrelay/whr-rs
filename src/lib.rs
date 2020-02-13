@@ -43,6 +43,7 @@ pub struct PayloadStruct {
     // TODO: add headers
 }
 
+// #[derive(Clone, Copy)]
 pub struct Request {
     payload: PayloadStruct,
 }
@@ -54,25 +55,43 @@ impl Request {
 
     // get_body returns request body string
     pub fn get_body(self) -> String {
-        self.payload.body
+        self.payload.body.clone()
     }
     // get_method returns request method
     pub fn get_method(self) -> String {
-        self.payload.method
-    }
+        self.payload.method.clone()
+    }     
+}
 
-    // set_request_body - modify request body
-    pub fn set_request_body(self, body: String) {
-        unsafe {
-            ext_set_request_body(body.as_ptr(), body.len());
-        }
+// set_request_body - modify request body
+pub fn set_request_body(body: String) {
+    unsafe {
+        ext_set_request_body(body.as_ptr(), body.len());
     }
+}
 
-    // set_request_method - modify request method
-    pub fn set_request_method(self, method: String) {
-        unsafe {
-            ext_set_request_method(method.as_ptr(), method.len());
-        }
+// set_request_method - modify request method
+pub fn set_request_method(method: String) {
+    unsafe {
+        ext_set_request_method(method.as_ptr(), method.len());
+    }
+}
+
+// set_request_path - update request path. This new path
+// will be added to the Output destination's path. If WHR Output 
+// path is /v1/store and this function sets /foo then the webhook 
+// will be sent to /v1/store/foo 
+pub fn set_request_path(path: String) {
+    unsafe {
+        ext_set_request_path(path.as_ptr(), path.len());
+    }
+}
+
+// set_request_raw_query - modify raw request query,
+// for example request "https://example.com/api/foo?foo=bar" raw query is foo=bar
+pub fn set_request_raw_query(query: String) {
+    unsafe {
+        ext_set_request_raw_query(query.as_ptr(), query.len());
     }
 }
 
