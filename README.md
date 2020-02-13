@@ -2,6 +2,10 @@
 
 This is a helper library to transform webhook request with [Webhook Relay Functions](https://webhookrelay.com/v1/guide/functions).
 
+Functions can be executed on public endpoints and for each destination (Webhook Relay can send same request to multiple destinations) allowing to customize data per service. In general, functions modify your request properties:
+
+![function transform example](https://webhookrelay.com/images/docs-forwarding/functions.png)
+
 Example:
 
 ```rust
