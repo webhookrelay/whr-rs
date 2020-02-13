@@ -53,6 +53,12 @@ ID                                     NAME                 DRIVER              
 064cf2ad-03e9-4707-b410-35be5bc125e9   hello_world          wasm                501 kB              11 hours            11 hours
 ```
 
+To create a public endpoint that's transforming webhooks with your function before sending them to your specified destination:
+
+```
+relay forward --bucket lib-rs --function hello_world --type public https://some-service.example.com/webhooks
+```
+
 ## Installing toolchain
 
 Toolchain can be installed using rustup:
