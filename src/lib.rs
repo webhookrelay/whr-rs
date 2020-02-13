@@ -1,7 +1,10 @@
+// #![feature(catch_panic)]
 extern crate base64;
+use std::panic;
 
 use std::slice;
 use std::str;
+use std::thread;
 
 use base64::decode;
 use serde::{Deserialize, Serialize};
@@ -9,6 +12,7 @@ use serde::{Deserialize, Serialize};
 // By default, the "env" namespace is used.
 extern "C" {
     fn ext_stop_forwarding();
+    fn ext_set_error(ptr: *const u8, len: usize);
     // ext_set_request_body function allows updating request body
     fn ext_set_request_body(ptr: *const u8, len: usize);
     // ext_set_request_header functions allows updating individual HTTP headers
@@ -29,6 +33,15 @@ extern "C" {
     // for example request "https://example.com/api/foo?foo=bar" raw query is foo=bar
     // so we can here update it to something=else.
     fn ext_set_request_raw_query(ptr: *const u8, len: usize);
+
+    fn ext_set_response_body(ptr: *const u8, len: usize);
+    fn ext_set_response_header(
+        key_ptr: *const u8,
+        key_len: usize,
+        val_ptr: *const u8,
+        val_len: usize,
+    );
+    fn ext_set_response_status_code(statusCode: i32);
 }
 
 #[derive(Serialize, Deserialize)]
@@ -132,12 +145,28 @@ pub fn set_request_raw_query(query: String) {
 // set_request_header - set request key/value
 pub fn set_request_header(key: String, value: String) {
     unsafe {
-        ext_set_request_header(
-            key.as_ptr(),
-            key.len(),
-            value.as_ptr(),
-            value.len(),
-        );
+        ext_set_request_header(key.as_ptr(), key.len(), value.as_ptr(), value.len());
+    }
+}
+
+// set_response_body - set response body
+pub fn set_response_body(body: String) {
+    unsafe {
+        ext_set_response_body(body.as_ptr(), body.len());
+    }
+}
+
+// set_response_status_code - set response status code (defaults to 200)
+pub fn set_response_status_code(status: i32) {
+    unsafe {
+        ext_set_response_status_code(status);
+    }
+}
+
+// set_response_header - set response header
+pub fn set_response_header(key: String, value: String) {
+    unsafe {
+        ext_set_response_header(key.as_ptr(), key.len(), value.as_ptr(), value.len());
     }
 }
 
@@ -155,7 +184,16 @@ pub fn run(ptr: i32, len: i32, to_run: fn(Request)) {
 
     let request = Request::new(payload);
 
-    to_run(request)
+    let result = panic::catch_unwind(move || {
+        to_run(request);
+    });
+
+    if result.is_err() {
+        let error_message = "function panicked";
+        unsafe {
+            ext_set_error(error_message.as_ptr(), error_message.len());
+        }
+    }
 }
 
 pub fn parse_payload(payload_string: &str) -> PayloadStruct {
