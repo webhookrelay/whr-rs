@@ -53,23 +53,23 @@ impl Request {
     }
 
     // get_body returns request body string
-    fn get_body(self) -> String {
+    pub fn get_body(self) -> String {
         self.payload.body
     }
     // get_method returns request method
-    fn get_method(self) -> String {
+    pub fn get_method(self) -> String {
         self.payload.method
     }
 
     // set_request_body - modify request body
-    fn set_request_body(self, body: String) {
+    pub fn set_request_body(self, body: String) {
         unsafe {
             ext_set_request_body(body.as_ptr(), body.len());
         }
     }
 
     // set_request_method - modify request method
-    fn set_request_method(self, method: String) {
+    pub fn set_request_method(self, method: String) {
         unsafe {
             ext_set_request_method(method.as_ptr(), method.len());
         }
