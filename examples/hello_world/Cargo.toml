@@ -16,5 +16,5 @@ crate-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-whr-rs = {path = "../../../whr-rs"}
+whr = {path = "../../../whr-rs"}
 
