@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 // By default, the "env" namespace is used.
 extern "C" {
+    fn ext_stop_forwarding();
     // ext_set_request_body function allows updating request body
     fn ext_set_request_body(ptr: *const u8, len: usize);
     // ext_set_request_header functions allows updating individual HTTP headers
@@ -86,6 +87,13 @@ impl Request {
     // get_method returns request method
     pub fn get_method(&self) -> String {
         self.payload.method.clone()
+    }
+}
+
+// stop_forwarding - don't forward this request any further
+pub fn stop_forwarding() {
+    unsafe {
+        ext_stop_forwarding();
     }
 }
 
