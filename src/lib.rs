@@ -129,6 +129,20 @@ pub fn set_request_raw_query(query: String) {
     }
 }
 
+// set_request_header - set request key/value
+pub fn set_request_header(key: String, value: String) {
+    unsafe {
+        ext_set_request_header(
+            key.as_ptr(),
+            key.len(),
+            value.as_ptr(),
+            value.len(),
+        );
+    }
+}
+
+// TODO: expose delete header fn
+
 /// Run a function
 ///
 pub fn run(ptr: i32, len: i32, to_run: fn(Request)) {
